@@ -1,0 +1,12 @@
+bin
+cache
+node_modules
+artifacts
+
+package-lock.json
+postcss.config.json
+tailwind.config.json
+
+.env
+hardhat.config.js
+config-override.js
