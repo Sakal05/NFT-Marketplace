@@ -1,5 +1,5 @@
 {
-  "address": "0xA95F42B5954553146568d38698176A1B5DF0E61a",
+  "address": "0x1E02dafe5B5009162da1c8A30419fa0E8AB5807d",
   "abi": [
     { "type": "constructor", "payable": false, "inputs": [] },
     {
@@ -194,6 +194,15 @@
     },
     {
       "type": "function",
+      "name": "getTokenURI",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [{ "type": "uint256", "name": "tokenID" }],
+      "outputs": [{ "type": "bytes" }]
+    },
+    {
+      "type": "function",
       "name": "isApprovedForAll",
       "constant": true,
       "stateMutability": "view",
@@ -243,7 +252,7 @@
         { "type": "address", "name": "from" },
         { "type": "address", "name": "to" },
         { "type": "uint256", "name": "tokenId" },
-        { "type": "bytes", "name": "_data" }
+        { "type": "bytes", "name": "data" }
       ],
       "outputs": []
     },
