@@ -57,7 +57,7 @@ export default function SellNFT() {
   };
 
   //function to create nft in the contract
-  const listNFT = async (e) => {
+  async function listNFT(e) {
     e.preventDefault();
 
     try {
@@ -76,9 +76,9 @@ export default function SellNFT() {
       const price = ethers.utils.parseUnits(formParams.price, "ether"); //parse the price into ether format
       let listingPrice = await contract.getListPrice(); //get the fee of marketplace contract
       listingPrice = listingPrice.toString(); //convert price to string
-
+      console.log(listingPrice);
       //creating nft
-      let newNFT = await contract.createNFT(metadata, price, {
+      let newNFT = await contract.createToken(metadata, price, {
         value: listingPrice,
       });
       await newNFT.wait();
@@ -88,7 +88,8 @@ export default function SellNFT() {
       updateFormParams({ name: "", description: "", price: "" });
       window.location.replace("/");
     } catch (e) {
-      alert( "Upload error"+e )
+      alert( "Upload error"+e );
+      console.error(e);
     }
   };
 

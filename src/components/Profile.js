@@ -6,10 +6,57 @@ import { useState } from "react";
 import NFTTile from "./NFTTile";
 
 export default function Profile () {
-    const [data, updateData] = useState([]);
+    const    [data, updateData] = useState([]);
     const [address, updateAddress] = useState("0x");
     const [totalPrice, updateTotalPrice] = useState("0");
-    
+    const [dataFetch, updateDataFetch] = useState(false);
+
+    async function getNFTData(tokenId) {
+        const ethers = require("ethers");
+        let sumPrice = 0;
+
+        //After adding your Hardhat network to your metamask, this code will get providers and signers
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const addr = await signer.getAddress();
+
+        //Pull the deployed contract instance
+        let contract = new ethers.Contract(MarketplaceJSON.address, MarketplaceJSON.abi, signer)
+
+        let transaction = await contract.getMyNFTs();
+
+        const items = await Promise.all(transaction.map(async i => {
+            const tokenURI = await contract.tokenURI(i.tokenId);
+            let meta = await axios.get(tokenURI);
+            meta = meta.data;
+            let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
+
+            let item = {
+                price,
+                tokenId: i.tokenId.toNumber(),
+                seller: i.seller,
+                owner: i.owner,
+                image: meta.image,
+                name: meta.name,
+                description: meta.description,
+            }
+            sumPrice += Number(price);
+            return item;
+
+        } ))
+        updateData(items);
+        updateDataFetch(true);
+        updateAddress(addr);
+        updateTotalPrice(sumPrice.toPrecision(3));
+        
+    }
+
+    const params = useParams();
+    const tokenId = params.tokenId;
+    if(!dataFetch){
+        getNFTData(tokenId);
+    }
+
     return (
         <div className="profileClass" style={{"min-height":"100vh"}}>
             <Navbar></Navbar>
@@ -38,7 +85,7 @@ export default function Profile () {
                     })}
                 </div>
                 <div className="mt-10 text-xl">
-                    {data.length == 0 ? "Oops, No NFT data to display (Are you logged in?)":""}
+                    {data.length === 0 ? "Oops, No NFT data to display (Are you logged in?)":""}
                 </div>
             </div>
             </div>

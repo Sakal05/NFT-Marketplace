@@ -17,5 +17,5 @@ module.exports = function override(config) {
     	process: 'process/browser', 
       Buffer: ['buffer', 'Buffer'] 
     }) 
-   ]) 
+   ])    
    return config; }
