@@ -1,5 +1,4 @@
 import Navbar from "./Navbar";
-import axie from "../tile.jpeg";
 import { useLocation, useParams } from "react-router-dom";
 import MarketplaceJSON from "../Marketplace.json";
 import axios from "axios";
@@ -26,8 +25,14 @@ export default function NFTPage(props) {
 
     const tokenURI = await contract.tokenURI(tokenId);
     const listedToken = await contract.getListedTokenForId(tokenId);
-    const meta = await axios.get(tokenURI);
-    
+    //const meta = await axios.get(tokenURI);
+    const res = await fetch(tokenURI, {
+      method: "GET",
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
+    let meta = await res.json();
     console.log(meta);
 
     let item = {
