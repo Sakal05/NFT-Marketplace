@@ -14,7 +14,7 @@ async function main() {
     address: marketplace.address,
     abi: JSON.parse(marketplace.interface.format('json'))
   }
-
+  console.log("deploy successfully, contract address: " + marketplace.address)
   //This writes the ABI and address to the mktplace.json
   fs.writeFileSync('./src/Marketplace.json', JSON.stringify(data))
 }

@@ -57,14 +57,14 @@ contract NFTMarketplace is ERC721URIStorage {
         _setTokenURI(newTokenId, tokenURI);
 
         //Helper function to update Global variables and emit an event
-        createToken(tokenURI, price);
+        createListedToken(newTokenId, price);
 
         return newTokenId;
     }
 
     function createListedToken(uint256 tokenId, uint256 price) private {
         require(price > 0, "price must be positive");
-        require(msg.value == price, "");
+        require(msg.value == price, "");    
 
         idToListedToken[tokenId] = ListedToken(
             tokenId,
@@ -94,7 +94,7 @@ contract NFTMarketplace is ERC721URIStorage {
             ListedToken storage currentToken = idToListedToken[currentId];
             tokens[currentIndex] = currentToken;
             currentIndex += 1;
-        }
+        }   
 
         return tokens;
     }

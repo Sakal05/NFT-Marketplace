@@ -14,7 +14,8 @@ export default function SellNFT() {
   const ethers = require("ethers");
   const [message, updateMessage] = useState("");
   const location = useLocation();
-
+  const [file, updateFile] = useState(null);
+  const [uploadStat, updateUploadStat] = useState(false);
   //This function uploads the NFT image to IPFS
   const OnChangeFile = async (e) => {
     var file = e.target.files[0];
@@ -25,6 +26,7 @@ export default function SellNFT() {
       if (response.success === true) {
         console.log("Uploaded image to Pinata: ", response.pinataURL);
         setFileURL(response.pinataURL);
+        updateUploadStat(true);
       }
     } catch (e) {
       console.log("Error during file upload", e);
@@ -73,11 +75,10 @@ export default function SellNFT() {
         signer
       );
       //massage the params to be sent to the create NFT request
-      const price = ethers.utils.parseUnits(formParams.price, "ether"); //parse the price into ether format
+      const price = ethers.utils.parseUnits(formParams.price, 18); //parse the price into ether format
       let listingPrice = await contract.getListPrice(); //get the fee of marketplace contract
       listingPrice = listingPrice.toString(); //convert price to string
-      console.log(listingPrice);
-      //creating nft
+
       let newNFT = await contract.createToken(metadata, price, {
         value: listingPrice,
       });
@@ -88,10 +89,10 @@ export default function SellNFT() {
       updateFormParams({ name: "", description: "", price: "" });
       window.location.replace("/");
     } catch (e) {
-      alert( "Upload error"+e );
+      alert("Upload error: " + e);
       console.error(e);
     }
-  };
+  }
 
   //const createToken = () => {};
   return (
@@ -169,12 +170,18 @@ export default function SellNFT() {
           </div>
           <br></br>
           <div className="text-green text-center">{message}</div>
-          <button
-            onClick={listNFT}
-            className="font-bold mt-10 w-full bg-purple-500 text-white rounded p-2 shadow-lg"
-          >
-            List NFT
-          </button>
+          {!uploadStat ? (
+            <button className="font-bold mt-10 w-full bg-purple-500 text-white rounded p-2 shadow-lg">
+              Uploading files...
+            </button>
+          ) : (
+            <button
+              onClick={listNFT}
+              className="font-bold mt-10 w-full bg-purple-500 text-white rounded p-2 shadow-lg"
+            >
+              List NFT
+            </button>
+          )}
         </form>
       </div>
     </div>
