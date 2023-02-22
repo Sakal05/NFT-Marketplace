@@ -21,9 +21,10 @@ export default function Marketplace() {
     );
     //create an NFT Token
     let transaction = await contract.getAllNFTs();
-
+    
     const items = await Promise.all(
       transaction.map(async (i) => {
+        console.log(i.tokenId.toString());
         const tokenURI = await contract.tokenURI(i.tokenId);
         const res = await fetch(tokenURI, {
           method: "GET",

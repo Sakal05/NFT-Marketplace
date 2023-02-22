@@ -10,14 +10,14 @@ async function main() {
 
     const nftContractFactory = await hre.ethers.getContractFactory("NFTMarketplace");
     const contract = await nftContractFactory.attach(
-        "0x26E2081a7a799Af44e6a432Fac83Cfb9b9e7e985" // The deployed contract address
+        "0xC9a2e14B2D001587eF4797c224332fEd612d1fb3" // The deployed contract address
     );
     // const contract = new hre.ethers.Contract(contractAddress, contractABI, signer);
 
 
     try {
-        await contract.createToken('{"name": "Testing", "description": "ok tesitng, the legendary hammer of the Norse god of thunder.", "image": "https://gateway.pinata.cloud/ipfs/QmXou1mty7AqhKzxrxC5C7Xqx8yVjVi8ZEqjacUpQQ89hD", "price" : "0.01"}', 0.01);
-
+        const getmynft = await contract.getMyNFTs();
+        console.log(getmynft);
         console.log("create successfully successfully");
     }
     catch (err) {

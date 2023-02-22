@@ -1,7 +1,6 @@
 import Navbar from "./Navbar";
 import { useLocation, useParams } from "react-router-dom";
 import MarketplaceJSON from "../Marketplace.json";
-import axios from "axios";
 import { useState } from "react";
 import NFTTile from "./NFTTile";
 
@@ -11,7 +10,65 @@ export default function Profile() {
   const [totalPrice, updateTotalPrice] = useState("0");
   const [dataFetch, updateDataFetch] = useState(false);
 
-  async function getNFTData(tokenId) {
+  // async function getNFTData() {
+  //   const ethers = require("ethers");
+  //   let sumPrice = 0;
+
+  //   //After adding your Hardhat network to your metamask, this code will get providers and signers
+  //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+  //   const signer = provider.getSigner();
+  //   const addr = await signer.getAddress();
+
+  //   //Pull the deployed contract instance
+  //   let contract = new ethers.Contract(
+  //     MarketplaceJSON.address,
+  //     MarketplaceJSON.abi,
+  //     signer
+  //   );
+
+  //   let transaction = await contract.getMyNFTs();
+
+  //   const items = await Promise.all(
+  //     transaction.map(async (i) => {
+  //       console.log(i.tokenId);
+  //       const tokenURI = await contract.tokenURI(i.tokenId);
+  //       //get metadata from ipfs by sending request to pindata cloud using axios
+  //       console.log(i.tokenId + " is " + tokenURI);
+  //       //const data = await axios.get(tokenURI);
+  //       const res = await fetch(tokenURI, {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "text/plain",
+  //         },
+  //       });
+  //       let metaData = await res.json();
+  //       //console.log('res', data);
+  //       //let meta = 'await axios.get(tokenURI)';
+
+  //       //let metaData = await meta.data;
+  //       let price = ethers.utils.formatUnits(i.price.toString(), "ether");
+
+  //       let item = {
+  //         price,
+  //         tokenId: i.tokenId.toNumber(),
+  //         seller: i.seller,
+  //         owner: i.owner,
+  //         image: metaData.image,
+  //         name: metaData.name,
+  //         description: metaData.description,
+  //       };
+  //       sumPrice += Number(price);
+  //       return item;
+  //     })
+  //   );
+  //   updateData(items);
+  //   updateDataFetch(true);
+  //   updateAddress(addr);
+  //   updateTotalPrice(sumPrice.toPrecision(3));
+  // }
+  
+  //fetch and filter data off chain
+  async function getMyNFTs() {
     const ethers = require("ethers");
     let sumPrice = 0;
 
@@ -27,54 +84,58 @@ export default function Profile() {
       signer
     );
 
-    let transaction = await contract.getMyNFTs();
+    let allNFT = await contract.getAllNFTs();
+    console.log('allNFT:', allNFT);
 
     const items = await Promise.all(
-      transaction.map(async (i) => {
-        const tokenURI = await contract.tokenURI(i.tokenId);
-        //get metadata from ipfs by sending request to pindata cloud using axios
-        console.log(tokenURI);
-        //const data = await axios.get(tokenURI);
-        const res = await fetch(tokenURI, {
-          method: "GET",
-          headers: {
-            "Content-Type": "text/plain",
-          },
-        });
-        let metaData = await res.json();
-        //console.log('res', data);
-        //let meta = 'await axios.get(tokenURI)';
-
-        //let metaData = await meta.data;
-        let price = ethers.utils.formatUnits(i.price.toString(), "ether");
-
-        let item = {
-          price,
-          tokenId: i.tokenId.toNumber(),
-          seller: i.seller,
-          owner: i.owner,
-          image: metaData.image,
-          name: metaData.name,
-          description: metaData.description,
-        };
-        sumPrice += Number(price);
-        return item;
-      })
+      allNFT.filter((i) => i.seller === addr).map(async (i) => {
+          console.log(`Token ID: ${i.tokenId}\nThis is seller address: ${i.seller}`);
+          console.log('token ID is: ' + i.tokenId);
+          const tokenURI = await contract.tokenURI(i.tokenId);
+          //get metadata from ipfs by sending request to pindata cloud using axios
+          console.log(i.tokenId + " is " + tokenURI);
+          const res = await fetch(tokenURI, {
+            method: "GET",
+            headers: {
+              "Content-Type": "text/plain",
+            },
+          });
+          let metaData = await res.json();
+          
+          
+          let price = ethers.utils.formatUnits(i.price.toString(), "ether");
+  
+          let item = {
+            price,
+            tokenId: i.tokenId.toNumber(),
+            seller: i.seller,
+            owner: i.owner,
+            image: metaData.image,
+            name: metaData.name,
+            description: metaData.description,
+          };
+          sumPrice += Number(price);
+          return item;
+        
+        })
+        
     );
-    updateData(items);
+
+    
+    updateData(items)
     updateDataFetch(true);
     updateAddress(addr);
     updateTotalPrice(sumPrice.toPrecision(3));
+  
   }
-
-  const params = useParams();
-  const tokenId = params.tokenId;
+  // const params = useParams();
+  // const tokenId = params.tokenId;
   if (!dataFetch) {
-    getNFTData(tokenId);
+    getMyNFTs();
   }
 
   return (
-    <div className="profileClass" style={{ "minHeight": "100vh" }}>
+    <div className="profileClass" style={{ minHeight: "100vh" }}>
       <Navbar></Navbar>
       <div className="profileClass">
         <div className="flex text-center flex-col mt-11 md:text-2xl text-white">
