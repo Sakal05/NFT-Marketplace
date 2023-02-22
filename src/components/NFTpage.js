@@ -64,14 +64,15 @@ export default function NFTPage(props) {
         signer
       );
       const salePrice = ethers.utils.parseUnits(data.price, "ether");
+      console.log(`this is bought token ID: ${tokenId} with this price: ${salePrice} `);
       let transaction = await contract.executeSale(tokenId, {
         value: salePrice,
       });
       await transaction.wait();
-
+      
       alert("You successfully bought the NFT!");
     } catch (e) {
-      alert("Upload Error" + e);
+      alert("Error" + e);
     }
   }
 
